@@ -3,142 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>108 Tiles Grid - Dark Mode</title>
+    <title>Pradakshina Counter</title>
     <style>
-        :root {
-            --bg-color: #f0f0f0;
-            --tile-bg: white;
-            --tile-text: black;
-            --greyed-out: grey;
-            --selected-glow: none;
-            --toggle-bg: black;
-            --toggle-text: white;
-        }
-
-        .dark-mode {
-            --bg-color: #121212;
-            --tile-bg: #1e1e1e;
-            --tile-text: white;
-            --greyed-out: #555;
-            --selected-glow: 0 0 10px limegreen;
-            --toggle-bg: white;
-            --toggle-text: black;
-        }
-
         body {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            background-color: var(--bg-color);
-            color: var(--tile-text);
-            font-family: Arial, sans-serif;
-            transition: background 0.3s ease, color 0.3s ease;
-            overflow: hidden;
-        }
-
-        .toggle-btn {
-            padding: 10px 20px;
-            font-size: 16px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            border: none;
-            background-color: var(--toggle-bg);
-            color: var(--toggle-text);
-            border-radius: 5px;
-        }
-
-        .grid-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 80vh;
-            width: 100%;
-            overflow-y: auto; /* Scroll enabled */
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(12, minmax(40px, 1fr));
-            gap: 5px;
-            max-width: 90vw;
-        }
-
-        .tile {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            padding: 20px;
-            font-size: 16px;
-            background-color: var(--tile-bg);
-            color: var(--tile-text);
-            border: 1px solid var(--tile-text);
-            cursor: pointer;
             text-align: center;
-            transition: background 0.2s, color 0.2s, box-shadow 0.3s;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
         }
 
-        .greyed-out {
-            background-color: var(--greyed-out);
+        .counter-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .counter {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .count-btn, .image-btn {
+            width: 400px;
+            height: 400px;
+            font-size: 32px;
+            font-weight: bold;
+            background-color: #007bff;
             color: white;
-            pointer-events: none;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            border-radius: 10px;
+            transition: background 0.3s, transform 0.1s;
         }
 
-        .dark-mode .greyed-out {
-            box-shadow: var(--selected-glow);
-            background-color: #222;
-            color: limegreen;
+        .count-btn:active, .image-btn:active {
+            transform: scale(0.95);
+        }
+
+        .image-btn {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .reset-btn {
+            background-color: red;
+            color: white;
+        }
+
+        .complete-btn {
+            background-color: green;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        input {
+            width: 80%;
+            max-width: 400px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            text-align: center;
         }
 
         @media (max-width: 768px) {
-            .grid {
-                grid-template-columns: repeat(6, minmax(40px, 1fr));
-            }
-            .tile {
-                padding: 15px;
-                font-size: 14px;
+            .count-btn, .image-btn {
+                width: 90%;
+                height: 300px;
+                font-size: 28px;
             }
         }
 
         @media (max-width: 480px) {
-            .grid-container {
-                height: 100vh;
-                overflow-y: scroll;
-            }
-            .grid {
-                grid-template-columns: repeat(4, minmax(40px, 1fr));
-            }
-            .tile {
-                padding: 10px;
-                font-size: 12px;
+            .count-btn, .image-btn {
+                width: 90%;
+                height: 250px;
+                font-size: 24px;
             }
         }
     </style>
 </head>
 <body>
-    <button class="toggle-btn" onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
-    <div class="grid-container">
-        <div class="grid" id="grid"></div>
+
+    <div class="counter-container">
+        <h1>Pradakshina Counter</h1>
+        <p class="counter">Count: <span id="count">0</span></p>
+        
+        <input type="text" id="imageUrl" placeholder="Enter image URL (optional)" oninput="updateButton()">
+
+        <button id="countBtn" class="count-btn" onclick="increaseCount()">COUNT UP</button>
+        
+        <div class="btn-container">
+            <button class="btn reset-btn" onclick="resetCount()">Reset</button>
+            <button class="btn complete-btn" onclick="completePradakshina()">Complete</button>
+        </div>
     </div>
 
     <script>
-        const grid = document.getElementById("grid");
+        let count = 0;
 
-        for (let i = 1; i <= 108; i++) {
-            let tile = document.createElement("div");
-            tile.classList.add("tile");
-            tile.textContent = i;
-            tile.addEventListener("click", function () {
-                this.classList.add("greyed-out");
-            });
-            grid.appendChild(tile);
+        function increaseCount() {
+            count++;
+            document.getElementById("count").textContent = count;
         }
 
-        function toggleDarkMode() {
-            document.body.classList.toggle("dark-mode");
+        function resetCount() {
+            count = 0;
+            document.getElementById("count").textContent = count;
+        }
+
+        function completePradakshina() {
+            alert(`You have completed ${count} Pradakshinas! Congratulations! 🎉`);
+        }
+
+        function updateButton() {
+            const imageUrl = document.getElementById("imageUrl").value;
+            const button = document.getElementById("countBtn");
+
+            if (imageUrl.trim() !== "") {
+                button.style.backgroundImage = `url(${imageUrl})`;
+                button.style.backgroundSize = "cover";
+                button.style.backgroundPosition = "center";
+                button.textContent = ""; // Remove text when image is used
+            } else {
+                button.style.backgroundImage = "none";
+                button.textContent = "COUNT UP";
+            }
         }
     </script>
+
 </body>
 </html>
