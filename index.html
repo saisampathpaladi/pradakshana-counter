@@ -35,6 +35,7 @@
             color: var(--tile-text);
             font-family: Arial, sans-serif;
             transition: background 0.3s ease, color 0.3s ease;
+            overflow: hidden;
         }
 
         .toggle-btn {
@@ -46,6 +47,15 @@
             background-color: var(--toggle-bg);
             color: var(--toggle-text);
             border-radius: 5px;
+        }
+
+        .grid-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80vh;
+            width: 100%;
+            overflow-y: auto; /* Scroll enabled */
         }
 
         .grid {
@@ -93,6 +103,10 @@
         }
 
         @media (max-width: 480px) {
+            .grid-container {
+                height: 100vh;
+                overflow-y: scroll;
+            }
             .grid {
                 grid-template-columns: repeat(4, minmax(40px, 1fr));
             }
@@ -105,7 +119,9 @@
 </head>
 <body>
     <button class="toggle-btn" onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
-    <div class="grid" id="grid"></div>
+    <div class="grid-container">
+        <div class="grid" id="grid"></div>
+    </div>
 
     <script>
         const grid = document.getElementById("grid");
